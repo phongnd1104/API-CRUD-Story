@@ -16,9 +16,9 @@ class Controller extends BaseController
     public function responseData($data)
     {
         return response()->json([
-            $this->status,
-            $this->message,
-            $data
+            "status" => $this->status,
+            "message" => $this->message,
+            "data" => $data
         ]);
     }
 }

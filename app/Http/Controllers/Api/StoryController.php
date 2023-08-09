@@ -22,6 +22,17 @@ class StoryController extends Controller
         $data = StoryResource::collection($this->storyRepo->all());
 
         return $this->responseData($data);
+    }
+    public function show($id)
+    {
+        $story = $this->storyRepo->find($id);
+        if($story)
+        {
+            $this->status = 200;
+            $this->message = "success";
+            $data = new StoryResource($story);
 
+        }
+            return $this->responseData($data??[]);
     }
 }
