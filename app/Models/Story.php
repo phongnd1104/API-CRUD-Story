@@ -18,6 +18,7 @@ class Story extends Model
             'type',
             'author_id',
             'illustrator_id',
+            'image_id',
             'created_at',
             'updated_at'
         ];
@@ -28,6 +29,10 @@ class Story extends Model
     public function illustrator()
     {
         return $this->belongsTo(Illustrator::class);
+    }
+    public function image()
+    {
+        return $this->belongsTo(Image::class);
     }
 
 }

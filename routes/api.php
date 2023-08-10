@@ -20,3 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('stories', [\App\Http\Controllers\Api\StoryController::class, 'index']);
 Route::get('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'show']);
+Route::post('stories', [\App\Http\Controllers\Api\StoryController::class, 'store']);
+Route::put('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'update']);
+

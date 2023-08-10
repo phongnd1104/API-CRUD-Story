@@ -19,8 +19,10 @@ return new class extends Migration
             $table->string('type');
             $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('illustrator_id');
+            $table->unsignedBigInteger('image_id');
             $table->foreign('author_id')->references('id')->on('authors')->onDelete('cascade');
             $table->foreign('illustrator_id')->references('id')->on('illustrators')->onDelete('cascade');
+            $table->foreign('image_id')->references('id')->on('images')->onDelete('cascade');
             $table->integer('created_at');
             $table->integer('updated_at');
         });

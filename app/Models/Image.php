@@ -10,8 +10,10 @@ class Image extends Model
     use HasFactory;
     public $timestamps = false;
     protected $fillable = [
-        'name',
+        'image',
         'path',
-        'classify'
+        'classify',
+        'created_at',
+        'updated_at'
     ];
 }

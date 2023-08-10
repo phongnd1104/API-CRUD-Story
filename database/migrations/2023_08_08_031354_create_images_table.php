@@ -16,10 +16,6 @@ return new class extends Migration
             $table->string('image');
             $table->string('path');
             $table->string('classify');
-            $table->unsignedBigInteger('story_id');
-            $table->unsignedBigInteger('page_id');
-            $table->foreign('story_id')->references('id')->on('stories')->onDelete('cascade');
-            $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
             $table->integer('created_at');
             $table->integer('updated_at');
         });

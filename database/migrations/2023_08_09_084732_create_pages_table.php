@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('story_id');
+            $table->unsignedBigInteger('image_id');
             $table->foreign('story_id')->references('id')->on('stories')->onDelete('cascade');
+            $table->foreign('image_id')->references('id')->on('images')->onDelete('cascade');
+
             $table->integer('created_at');
             $table->integer('updated_at');
         });
