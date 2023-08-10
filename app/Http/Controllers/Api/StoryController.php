@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ImageResource;
 use App\Http\Resources\StoryResource;
 use App\Repositories\Image\ImageRepository;
 use App\Repositories\Story\StoryRepository as StoryRepository;
@@ -10,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
-use function Symfony\Component\Translation\t;
 
 
 class StoryController extends Controller
@@ -102,8 +102,8 @@ class StoryController extends Controller
                 $this->status = "success";
                 $this->message = " Created Successfully";
                 $data = [
-                    "story" => $story,
-                    "image" => $image
+                    "story" => new StoryResource($story),
+                    "image" => new ImageResource($image)
                 ];
             }
             next:
@@ -168,5 +168,22 @@ class StoryController extends Controller
         }
     }
 
-    
+    public function destroy($id)
+    {
+
+        db::beginTransaction();
+        try {
+            $story = $this->storyRepo->destroy($id);
+            $image = $this->imageRepo->destroy($id);
+            if($story && $image){
+                $this->status = 200;
+                $this->message = "deleted successfully";
+            }
+            db::commit();
+        }catch (\Exception){
+            db::rollBack();
+        }
+        return $this->responseData($data ?? []);
+    }
+
 }

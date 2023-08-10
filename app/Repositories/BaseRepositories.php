@@ -40,6 +40,11 @@ abstract class BaseRepositories implements RepositoriesInterface
     public function destroy($id)
     {
         $object = $this->model->find($id);
-        return $object->delete();
+        if($object)
+        {
+            return $object->delete();
+        }
+
+
     }
 }
