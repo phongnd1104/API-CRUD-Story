@@ -20,9 +20,9 @@ class StoryResource extends JsonResource
             'course' => $this->course,
             'project' => $this->project,
             'type' => $this->type,
-            'thumb' => $this->thumb,
             'author' => $this->author->name,
             'illustrator'=>$this->illustrator->name,
+            'image' => $this->image->image,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];

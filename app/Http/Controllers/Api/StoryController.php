@@ -113,5 +113,60 @@ class StoryController extends Controller
 
     }
 
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(),[
+            'name' => 'required',
+            'project' => 'required',
+            'course' => 'required',
+            'type' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'author_id' => 'required|numeric',
+            'illustrator_id' => 'required|numeric'
+        ]);
+
+        if($validator->fails())
+        {
+            $this->status = "422";
+            $this->message = $validator->messages();
+            goto next;
+        }else
+        {
+
+                $getUpLoadFile = $request->file('image');
+                $imageName = time().".".$getUpLoadFile->extension();
+                $imagePath = public_path("/images/stories");
+                $getUpLoadFile->move($imagePath, $imageName);
+
+                $image = $this->imageRepo->update([
+                    'image' => $imageName,
+                    'path' => $imagePath,
+                    'classify' => "thumb",
+                    'updated_at' => time()
+                ], $id);
+                $getImage = $this->imageRepo->find($id);
+                $story = $this->storyRepo->update([
+                    'name' => $request->name,
+                    'project' => $request->project,
+                    'course' => $request->course,
+                    'type' => $request->type,
+                    'thumb' => $request->thumb,
+                    'author_id' => $request->author_id,
+                    'illustrator_id' => $request->illustrator_id,
+                    'image_id' => $getImage->id,
+                    'updated_at'=>time()
+                ], $id);
+
+            if($image)
+            {
+                $this->status = "success";
+                $this->message = " Updated Successfully";
+            }
+            next:
+
+            return $this->responseData($data ?? []);
+        }
+    }
+
     
 }
