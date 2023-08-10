@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('texts', function (Blueprint $table) {
             $table->id();
-            $table->string('content');
+            $table->string('sentence');
             $table->unsignedBigInteger('audio_id');
             $table->foreign('audio_id')->references('id')->on('audio')->onDelete('cascade');
             $table->integer('created_at');

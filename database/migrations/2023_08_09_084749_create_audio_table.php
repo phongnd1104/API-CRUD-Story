@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('audio', function (Blueprint $table) {
             $table->id();
-            $table->string('file');
+            $table->string('path');
+            $table->string('audio');
             $table->integer('created_at');
             $table->integer('updated_at');
         });
