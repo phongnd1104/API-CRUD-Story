@@ -37,5 +37,34 @@ class StoryController extends Controller
             return $this->responseData($data??[]);
     }
 
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'name' => 'required',
+            'project' => 'required',
+            'course' => 'required',
+            'type' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'author_id' => 'required|numeric',
+            'illustrator_id' => 'required|numeric'
+        ]);
 
+        if($validator->fails())
+        {
+            $this->status = "422";
+            $this->message = $validator->messages();
+        }else
+        {
+            $story = $this->storyRepo->store([
+                'name' => $request->name,
+                'project' => $request->project,
+                'course' => $request->course,
+                'type' => $request->type,
+                'thumb' => $request->thumb,
+                'author_id' => $request->author_id,
+                'illustrator_id' => $request->illustrator_id
+            ]);
+        }
+
+    }
 }
