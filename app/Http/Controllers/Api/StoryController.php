@@ -10,7 +10,10 @@ use App\Repositories\Story\StoryRepository as StoryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use mysql_xdevapi\Exception;
 
 
 class StoryController extends Controller
@@ -46,6 +49,7 @@ class StoryController extends Controller
 
     public function store(Request $request)
     {
+
         $validator = Validator::make($request->all(),[
             'name' => 'required',
             'project' => 'required',
@@ -66,9 +70,9 @@ class StoryController extends Controller
             DB::beginTransaction();
             try {
                 $getUpLoadFile = $request->file('image');
-                $imageName = time().".".$getUpLoadFile->extension();
-                $imagePath = public_path("/images/stories");
-                $getUpLoadFile->move($imagePath, $imageName);
+                $imageName = Str::random(32).".".$getUpLoadFile->extension();
+                Storage::disk('public')->put($imageName, file_get_contents($request->image));
+                $imagePath = storage_path("app/public".$imageName);
 
                 $image = $this->imageRepo->store([
                     'image' => $imageName,
@@ -82,32 +86,29 @@ class StoryController extends Controller
                     'project' => $request->project,
                     'course' => $request->course,
                     'type' => $request->type,
-                    'thumb' => $request->thumb,
                     'author_id' => $request->author_id,
                     'illustrator_id' => $request->illustrator_id,
                     'image_id' => $image->id,
                     'created_at'=>time(),
                     'updated_at'=>time()
                 ]);
+
+                if($image)
+                {
+                    $this->status = "success";
+                    $this->message = " Created Successfully";
+                    $data = [
+                        "story" => new StoryResource($story),
+                        "image" => new ImageResource($image)
+                    ];
+                }
                 DB::commit();
             }catch (\Exception $e)
             {
                 DB::rollBack();
                 throw new \Exception($e->getMessage());
             }
-
-
-            if($image)
-            {
-                $this->status = "success";
-                $this->message = " Created Successfully";
-                $data = [
-                    "story" => new StoryResource($story),
-                    "image" => new ImageResource($image)
-                ];
-            }
             next:
-
             return $this->responseData($data ?? []);
         }
 
@@ -132,11 +133,20 @@ class StoryController extends Controller
             goto next;
         }else
         {
+            $getImage = $this->imageRepo->find($id);
+            if($request->image){
+                $storage = Storage::disk('public');
+                if($storage->exists($getImage->image)){
+                    $storage->delete($getImage->image);
+                }
+            }
+            $getUpLoadFile = $request->file('image');
+            $imageName = Str::random(32).".".$getUpLoadFile->extension();
+            Storage::disk('public')->put($imageName, file_get_contents($request->image));
+            $imagePath = storage_path("app/public".$imageName);
 
-                $getUpLoadFile = $request->file('image');
-                $imageName = time().".".$getUpLoadFile->extension();
-                $imagePath = public_path("/images/stories");
-                $getUpLoadFile->move($imagePath, $imageName);
+            db::beginTransaction();
+            try {
 
                 $image = $this->imageRepo->update([
                     'image' => $imageName,
@@ -144,7 +154,7 @@ class StoryController extends Controller
                     'classify' => "thumb",
                     'updated_at' => time()
                 ], $id);
-                $getImage = $this->imageRepo->find($id);
+
                 $story = $this->storyRepo->update([
                     'name' => $request->name,
                     'project' => $request->project,
@@ -157,11 +167,19 @@ class StoryController extends Controller
                     'updated_at'=>time()
                 ], $id);
 
-            if($image)
+                if($image)
+                {
+                    $this->status = "success";
+                    $this->message = " Updated Successfully";
+                }
+                db::commit();
+            }catch (\Exception $e)
             {
-                $this->status = "success";
-                $this->message = " Updated Successfully";
+                db::rollBack();
+
+                throw new Exception($e->getMessage());
             }
+
             next:
 
             return $this->responseData($data ?? []);
@@ -170,12 +188,16 @@ class StoryController extends Controller
 
     public function destroy($id)
     {
-
+        $getImage = $this->imageRepo->find($id);
         db::beginTransaction();
         try {
             $story = $this->storyRepo->destroy($id);
             $image = $this->imageRepo->destroy($id);
+
+            $storage = Storage::disk('public');
+            $storage->delete($getImage->image);
             if($story && $image){
+
                 $this->status = 200;
                 $this->message = "deleted successfully";
             }
