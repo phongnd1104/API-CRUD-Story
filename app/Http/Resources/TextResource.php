@@ -16,8 +16,8 @@ class TextResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'content' => $this->id,
-            'audio' => new AudioResource($this->audio)
+            'sentence' => $this->sentence,
+            'audio' => $this->audio->audio
         ];
     }
 }
