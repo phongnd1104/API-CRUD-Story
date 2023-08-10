@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\StoryResource;
 use App\Repositories\Story\StoryRepository as StoryRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class StoryController extends Controller
 {
@@ -35,4 +36,6 @@ class StoryController extends Controller
         }
             return $this->responseData($data??[]);
     }
+
+
 }

@@ -21,7 +21,6 @@ class StoryFactory extends Factory
             'course' => $this->faker->sentence(3),
             'project' => $this->faker->sentence(3),
             'type' => $this->faker->sentence(3),
-            'thumb' => $this->faker->sentence(3),
             'author_id' => rand(1,10),
             'illustrator_id' => rand(1,10),
             'created_at' => rand(1,1000),

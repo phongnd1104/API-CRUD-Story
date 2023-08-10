@@ -17,7 +17,6 @@ class PageFactory extends Factory
     public function definition(): array
     {
         return [
-            'background' => $this->faker->sentence(3),
             'story_id' => rand(1,50),
             'created_at' => rand(10,1000),
             'updated_at' => rand(10,1000)

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('course');
             $table->string('project');
             $table->string('type');
-            $table->string('thumb');
             $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('illustrator_id');
             $table->foreign('author_id')->references('id')->on('authors')->onDelete('cascade');
