@@ -25,5 +25,8 @@ Route::put('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'u
 Route::delete('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'destroy']);
 
 
+Route::get('texts', [\App\Http\Controllers\Api\TextController::class, 'index']);
 Route::post('texts', [\App\Http\Controllers\Api\TextController::class, 'store']);
+Route::get('texts/{id}', [\App\Http\Controllers\Api\TextController::class, 'show']);
+
 

@@ -25,6 +25,29 @@ class TextController extends Controller
         $this->audioRepo = $audioRepo;
     }
 
+    public function index()
+    {
+        $text = $this->textRepo->all();
+        $data = TextResource::collection($text);
+        $this->message = "Success";
+
+        return $this->responseData($data??[]);
+    }
+
+    public function show($id)
+    {
+        $text = $this->textRepo->find($id);
+        if($text)
+        {
+            $this->message = "success";
+            $data = new TextResource($text);
+        }else{
+            $this->message = "find not found";
+        }
+
+        return $this->responseData($data??[]);
+    }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -44,7 +67,7 @@ class TextController extends Controller
             $result = (!str_contains($sentence, "'") ? $sentence : str_replace("'","_", $sentence) );
             $audioName = $result.".".$AudioUpload->extension();
             Storage::disk("public")->put($audioName, file_get_contents($request->audio));
-            $audioPath = storage_path("app/public".$audioName);
+            $audioPath = storage_path("app/public/".$audioName);
 
             $audio = $this->audioRepo->store([
                 'audio' => $audioName,
@@ -76,4 +99,6 @@ class TextController extends Controller
         next:
         return $this->responseData($data??[]);
     }
+
+
 }
