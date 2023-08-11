@@ -28,5 +28,7 @@ Route::delete('stories/{id}', [\App\Http\Controllers\Api\StoryController::class,
 Route::get('texts', [\App\Http\Controllers\Api\TextController::class, 'index']);
 Route::post('texts', [\App\Http\Controllers\Api\TextController::class, 'store']);
 Route::get('texts/{id}', [\App\Http\Controllers\Api\TextController::class, 'show']);
+Route::put('texts/{id}', [\App\Http\Controllers\Api\TextController::class, 'update']);
+Route::delete('texts/{id}', [\App\Http\Controllers\Api\TextController::class, 'destroy']);
 
 

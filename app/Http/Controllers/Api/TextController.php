@@ -100,5 +100,53 @@ class TextController extends Controller
         return $this->responseData($data??[]);
     }
 
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(),[
+            'audio' => 'required',
+            'sentence' => 'required|string'
+        ]);
+        if ($validator->fails())
+        {
+            $this->message = $validator->messages();
+            goto next;
+        }
+        DB::beginTransaction();
+        try {
+            $sentence = $request->sentence;
+            $getAudio = $this->audioRepo->find($id);
+            $AudioUpload = $request->file('audio');
+            $result = (!str_contains($sentence, "'") ? $sentence : str_replace("'","_", $sentence) );
+            $audioName = $result.".".$AudioUpload->extension();
+            Storage::disk("public")->put($audioName, file_get_contents($request->audio));
+            $audioPath = storage_path("app/public/".$audioName);
+
+            $audio = $this->audioRepo->update([
+                'audio' => $audioName,
+                'path' =>   $audioPath,
+                'updated_at' => time()
+            ], $id);
+
+            $text = $this->textRepo->update([
+                'sentence' => $request->sentence,
+                'audio_id' => $getAudio->id,
+                'updated_at' => time()
+            ],$id);
+
+            if($text){
+                $this->message = "updated successfully";
+
+            }
+            db::commit();
+        }catch (Exception $e)
+        {
+            db::rollBack();
+            throw new Exception($e->getMessage());
+        }
+        next:
+        return $this->responseData($data??[]);
+    }
+    
+
 
 }
