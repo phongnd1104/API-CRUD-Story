@@ -149,15 +149,42 @@ class TextController extends Controller
 
             }
             db::commit();
-        }catch (Exception $e)
+        }catch (\Exception $e)
         {
             db::rollBack();
-            throw new Exception($e->getMessage());
+//            throw new Exception($e->getMessage());
         }
         next:
         return $this->responseData($data??[]);
     }
 
+    public function destroy($id)
+    {
+        $getAudio = $this->audioRepo->find($id);
 
+
+        db::beginTransaction();
+        try{
+            $text = $this->textRepo->destroy($id);
+            $audio = $this->audioRepo->destroy($id);
+
+            $storage = Storage::disk('public');
+            if($storage->exists($getAudio->audio)){
+                $storage->delete($getAudio->audio);
+            }
+            if($text && $audio)
+            {
+                $this->message = "deleted successfully";
+
+            }
+            db::commit();
+        }catch (\Exception $e){
+            db::rollBack();
+
+//            throw new Exception($e->getMessage());
+        }
+
+        return $this->responseData($data??[]);
+    }
 
 }
