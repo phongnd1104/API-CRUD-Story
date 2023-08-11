@@ -115,11 +115,22 @@ class TextController extends Controller
         try {
             $sentence = $request->sentence;
             $getAudio = $this->audioRepo->find($id);
+
+            if($request->audio)
+            {
+                $storage = Storage::disk('public');
+                if($storage->exists($getAudio->audio)){
+                    $storage->delete($getAudio->audio);
+                }
+            }
+
             $AudioUpload = $request->file('audio');
             $result = (!str_contains($sentence, "'") ? $sentence : str_replace("'","_", $sentence) );
             $audioName = $result.".".$AudioUpload->extension();
             Storage::disk("public")->put($audioName, file_get_contents($request->audio));
             $audioPath = storage_path("app/public/".$audioName);
+
+
 
             $audio = $this->audioRepo->update([
                 'audio' => $audioName,
@@ -146,7 +157,7 @@ class TextController extends Controller
         next:
         return $this->responseData($data??[]);
     }
-    
+
 
 
 }
