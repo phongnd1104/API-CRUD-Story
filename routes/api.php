@@ -31,4 +31,10 @@ Route::get('texts/{id}', [\App\Http\Controllers\Api\TextController::class, 'show
 Route::put('texts/{id}', [\App\Http\Controllers\Api\TextController::class, 'update']);
 Route::delete('texts/{id}', [\App\Http\Controllers\Api\TextController::class, 'destroy']);
 
+Route::get('pages', [\App\Http\Controllers\Api\PageController::class, 'index']);
+Route::post('pages', [\App\Http\Controllers\Api\PageController::class, 'store']);
+Route::get('pages/{id}', [\App\Http\Controllers\Api\PageController::class, 'show']);
+Route::put('pages/{id}', [\App\Http\Controllers\Api\PageController::class, 'update']);
+Route::delete('pages/{id}', [\App\Http\Controllers\Api\PageController::class, 'destroy']);
+
 
