@@ -49,8 +49,7 @@ class PageController extends Controller
              $this->message = $validator->messages();
              goto next;
          }
-         DB::beginTransaction();
-         try {
+
 
              $getUploadFile = $request->file('image');
              $imageName = Str::random(32)."background.".$getUploadFile->extension();
@@ -79,11 +78,8 @@ class PageController extends Controller
                      'image' => new ImageResource($image)
                  ];
              }
-            DB::commit();
-             DB::rollBack();
-         }catch (\Exception $e){
-             throw new \Exception($e->getMessage());
-         }
+
+
          next:
          return $this->responseData($data??[]);
 
