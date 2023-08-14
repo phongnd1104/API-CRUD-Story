@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ImageResource;
+use App\Http\Resources\PageResource;
 use App\Repositories\Image\ImageRepository;
 use App\Repositories\Page\PageRepository;
 use Illuminate\Http\Request;
@@ -21,6 +23,17 @@ class PageController extends Controller
          $this->pageRepo = $pageRepo;
          $this->imageRepo = $imageRepo;
      }
+
+     public function index()
+     {
+        $page = $this->pageRepo->all();
+        $data = PageResource::collection($page);
+        if($data){
+            $this->message = "Success";
+        }
+        return $this->responseData($data??[]);
+     }
+
 
      public function store(Request $request)
      {
@@ -62,13 +75,13 @@ class PageController extends Controller
              if($image && $page){
                  $this->message = "created successfully";
                  $data = [
-                     'page' => $page,
-                     'image' => $image
+                     'page' => new PageResource($page),
+                     'image' => new ImageResource($image)
                  ];
              }
             DB::commit();
-         }catch (\Exception $e){
              DB::rollBack();
+         }catch (\Exception $e){
              throw new \Exception($e->getMessage());
          }
          next:

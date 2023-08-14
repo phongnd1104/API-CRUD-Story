@@ -14,10 +14,16 @@ class PageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $textPageResources = [];
+        foreach ($this->textpages as $textpage) {
+            $textPageResources[] = new TextPageResouce($textpage);
+        }
+
         return [
+            'page_id' => $this->id,
             'story' => $this->story->name,
             'background' => $this->image->image,
-            'content' => new TextResource($this->text)
+            'config' => $textPageResources
         ];
     }
 }

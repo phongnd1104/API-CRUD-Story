@@ -30,5 +30,10 @@ class Page extends Model
         return $this->belongsToMany(Text::class, 'text_page')->withPivot('positions')->withTimestamps();
     }
 
+    public function textpages()
+    {
+        return $this->hasMany(TextPage::class,'page_id');
+    }
+
 
 }
