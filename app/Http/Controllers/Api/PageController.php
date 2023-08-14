@@ -49,8 +49,6 @@ class PageController extends Controller
              $this->message = $validator->messages();
              goto next;
          }
-
-
              $getUploadFile = $request->file('image');
              $imageName = Str::random(32)."background.".$getUploadFile->extension();
              $imagePath = storage_path('app/public');
@@ -78,7 +76,6 @@ class PageController extends Controller
                      'image' => new ImageResource($image)
                  ];
              }
-
 
          next:
          return $this->responseData($data??[]);
