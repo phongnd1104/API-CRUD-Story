@@ -84,7 +84,7 @@ class TextController extends Controller
                 ];
             }
             db::commit();
-        }catch (Exception $e)
+        }catch (\Exception $e)
         {
             db::rollBack();
             throw new Exception($e->getMessage());
