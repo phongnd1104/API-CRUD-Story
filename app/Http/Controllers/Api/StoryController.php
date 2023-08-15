@@ -93,7 +93,6 @@ class StoryController extends Controller
                 DB::rollBack();
                 throw new Exception($e->getMessage());
             }
-            next:
             return $this->responseData($data ?? []);
         }
 
@@ -145,9 +144,6 @@ class StoryController extends Controller
 
             throw new Exception($e->getMessage());
         }
-
-            next:
-
             return $this->responseData($data ?? []);
 
     }

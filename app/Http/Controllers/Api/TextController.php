@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TextRequest;
 use App\Http\Resources\AudioResource;
 use App\Http\Resources\TextResource;
 use App\Repositories\Audio\AudioRepository;
@@ -48,17 +49,9 @@ class TextController extends Controller
         return $this->responseData($data??[]);
     }
 
-    public function store(Request $request)
+    public function store(TextRequest $request)
     {
-        $validator = Validator::make($request->all(),[
-            'audio' => 'required',
-            'sentence' => 'required|string'
-        ]);
-        if ($validator->fails())
-        {
-            $this->message = $validator->messages();
-            goto next;
-        }
+        $request->validated();
         DB::beginTransaction();
         try {
             $sentence = $request->sentence;
@@ -96,21 +89,12 @@ class TextController extends Controller
             db::rollBack();
             throw new Exception($e->getMessage());
         }
-        next:
         return $this->responseData($data??[]);
     }
 
-    public function update(Request $request, $id)
+    public function update(TextRequest $request, $id)
     {
-        $validator = Validator::make($request->all(),[
-            'audio' => 'required',
-            'sentence' => 'required|string'
-        ]);
-        if ($validator->fails())
-        {
-            $this->message = $validator->messages();
-            goto next;
-        }
+        $request->validated();
         DB::beginTransaction();
         try {
             $sentence = $request->sentence;
@@ -154,7 +138,6 @@ class TextController extends Controller
             db::rollBack();
 //            throw new Exception($e->getMessage());
         }
-        next:
         return $this->responseData($data??[]);
     }
 

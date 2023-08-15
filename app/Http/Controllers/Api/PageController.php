@@ -67,7 +67,6 @@ class PageController extends Controller
              ];
          }
 
-         next:
          return $this->responseData($data??[]);
 
      }
