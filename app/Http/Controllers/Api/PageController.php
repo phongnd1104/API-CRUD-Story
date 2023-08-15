@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PageRequest;
 use App\Http\Resources\ImageResource;
 use App\Http\Resources\PageResource;
 use App\Repositories\Image\ImageRepository;
@@ -35,47 +36,36 @@ class PageController extends Controller
      }
 
 
-     public function store(Request $request)
+     public function store(PageRequest $request)
      {
-         $validator = Validator::make($request->all(),
-         [
-             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-             'story_id' => 'required',
-             'text_id' => 'required|numeric'
+         $request->validated();
+         $getUploadFile = $request->file('image');
+         $imageName = Str::random(32)."background.".$getUploadFile->extension();
+         $imagePath = storage_path('app/public');
+         Storage::disk('public')->put($imageName,file_get_contents($request->image));
 
+         $image = $this->imageRepo->store([
+             'image' => $request->image,
+             'path' => $imagePath,
+             'classify' => "background",
+             'created_at' => time(),
+             'updated_at' => time()
          ]);
-         if (!$validator)
-         {
-             $this->message = $validator->messages();
-             goto next;
+         $page = $this->pageRepo->store([
+             'image_id' => $image->id,
+             'story_id' => $request->story_id,
+             'created_at' => time(),
+             'updated_at' => time()
+         ]);
+
+         $page->texts()->attach($request->text_id, ['positions'=>$request->positions]);
+         if($image && $page){
+             $this->message = "created successfully";
+             $data = [
+                 'page' => new PageResource($page),
+                 'image' => new ImageResource($image)
+             ];
          }
-             $getUploadFile = $request->file('image');
-             $imageName = Str::random(32)."background.".$getUploadFile->extension();
-             $imagePath = storage_path('app/public');
-             Storage::disk('public')->put($imageName,file_get_contents($request->image));
-
-             $image = $this->imageRepo->store([
-                 'image' => $request->image,
-                 'path' => $imagePath,
-                 'classify' => "background",
-                 'created_at' => time(),
-                 'updated_at' => time()
-             ]);
-             $page = $this->pageRepo->store([
-                 'image_id' => $image->id,
-                 'story_id' => $request->story_id,
-                 'created_at' => time(),
-                 'updated_at' => time()
-             ]);
-
-             $page->texts()->attach($request->text_id, ['positions'=>$request->positions]);
-             if($image && $page){
-                 $this->message = "created successfully";
-                 $data = [
-                     'page' => new PageResource($page),
-                     'image' => new ImageResource($image)
-                 ];
-             }
 
          next:
          return $this->responseData($data??[]);
