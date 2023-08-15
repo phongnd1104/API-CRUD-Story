@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoryRequest;
 use App\Http\Resources\ImageResource;
 use App\Http\Resources\StoryResource;
 use App\Repositories\Image\ImageRepository;
@@ -47,26 +48,10 @@ class StoryController extends Controller
             return $this->responseData($data??[]);
     }
 
-    public function store(Request $request)
+    public function store(StoryRequest $request)
     {
+            $request->validated();
 
-        $validator = Validator::make($request->all(),[
-            'name' => 'required',
-            'project' => 'required',
-            'course' => 'required',
-            'type' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'author_id' => 'required|numeric',
-            'illustrator_id' => 'required|numeric'
-        ]);
-
-        if($validator->fails())
-        {
-            $this->status = "422";
-            $this->message = $validator->messages();
-            goto next;
-        }else
-        {
             DB::beginTransaction();
             try {
                 $getUpLoadFile = $request->file('image');
@@ -106,84 +91,65 @@ class StoryController extends Controller
             }catch (\Exception $e)
             {
                 DB::rollBack();
-                throw new \Exception($e->getMessage());
-            }
-            next:
-            return $this->responseData($data ?? []);
-        }
-
-    }
-
-    public function update(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(),[
-            'name' => 'required',
-            'project' => 'required',
-            'course' => 'required',
-            'type' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'author_id' => 'required|numeric',
-            'illustrator_id' => 'required|numeric'
-        ]);
-
-        if($validator->fails())
-        {
-            $this->status = "422";
-            $this->message = $validator->messages();
-            goto next;
-        }else
-        {
-            $getImage = $this->imageRepo->find($id);
-            if($request->image){
-                $storage = Storage::disk('public');
-                if($storage->exists($getImage->image)){
-                    $storage->delete($getImage->image);
-                }
-            }
-            $getUpLoadFile = $request->file('image');
-            $imageName = Str::random(32).".".$getUpLoadFile->extension();
-            Storage::disk('public')->put($imageName, file_get_contents($request->image));
-            $imagePath = storage_path("app/public".$imageName);
-
-            db::beginTransaction();
-            try {
-
-                $image = $this->imageRepo->update([
-                    'image' => $imageName,
-                    'path' => $imagePath,
-                    'classify' => "thumb",
-                    'updated_at' => time()
-                ], $id);
-
-                $story = $this->storyRepo->update([
-                    'name' => $request->name,
-                    'project' => $request->project,
-                    'course' => $request->course,
-                    'type' => $request->type,
-                    'thumb' => $request->thumb,
-                    'author_id' => $request->author_id,
-                    'illustrator_id' => $request->illustrator_id,
-                    'image_id' => $getImage->id,
-                    'updated_at'=>time()
-                ], $id);
-
-                if($image)
-                {
-                    $this->status = "success";
-                    $this->message = " Updated Successfully";
-                }
-                db::commit();
-            }catch (\Exception $e)
-            {
-                db::rollBack();
-
                 throw new Exception($e->getMessage());
             }
+            next:
+            return $this->responseData($data ?? []);
+        }
+
+    public function update(StoryRequest $request, $id)
+    {
+        $request->validated();
+        $getImage = $this->imageRepo->find($id);
+        if($request->image){
+            $storage = Storage::disk('public');
+            if($storage->exists($getImage->image)){
+                $storage->delete($getImage->image);
+            }
+        }
+        $getUpLoadFile = $request->file('image');
+        $imageName = Str::random(32).".".$getUpLoadFile->extension();
+        Storage::disk('public')->put($imageName, file_get_contents($request->image));
+        $imagePath = storage_path("app/public".$imageName);
+
+        db::beginTransaction();
+        try {
+            $image = $this->imageRepo->update([
+                'image' => $imageName,
+                'path' => $imagePath,
+                'classify' => "thumb",
+                'updated_at' => time()
+            ], $id);
+
+            $story = $this->storyRepo->update([
+                'name' => $request->name,
+                'project' => $request->project,
+                'course' => $request->course,
+                'type' => $request->type,
+                'thumb' => $request->thumb,
+                'author_id' => $request->author_id,
+                'illustrator_id' => $request->illustrator_id,
+                'image_id' => $getImage->id,
+                'updated_at'=>time()
+            ], $id);
+
+            if($image)
+            {
+                $this->status = "success";
+                $this->message = " Updated Successfully";
+            }
+            db::commit();
+        }catch (\Exception $e)
+        {
+            db::rollBack();
+
+            throw new Exception($e->getMessage());
+        }
 
             next:
 
             return $this->responseData($data ?? []);
-        }
+
     }
 
     public function destroy($id)
