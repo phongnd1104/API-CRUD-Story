@@ -22,7 +22,7 @@ class StoryResource extends JsonResource
             'type' => $this->type,
             'author' => $this->author->name,
             'illustrator'=>$this->illustrator->name,
-            'image' => $this->image->image,
+            'image' => $this->image->path,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];

@@ -20,13 +20,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('register',[\App\Http\Controllers\Api\AuthenticationController::class, 'register']);
 Route::post('login',[\App\Http\Controllers\Api\AuthenticationController::class, 'login']);
-
+Route::get('stories', [\App\Http\Controllers\Api\StoryController::class, 'index']);
+Route::get('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'show']);
+Route::post('stories', [\App\Http\Controllers\Api\StoryController::class, 'store']);
+Route::put('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'update']);
+Route::delete('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'destroy']);
+Route::get('test', function(){
+    return "aaa";
+});
 Route::middleware('auth:api')->group(function (){
-    Route::get('stories', [\App\Http\Controllers\Api\StoryController::class, 'index']);
-    Route::get('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'show']);
-    Route::post('stories', [\App\Http\Controllers\Api\StoryController::class, 'store']);
-    Route::put('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'update']);
-    Route::delete('stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'destroy']);
+   
 
 
     Route::get('texts', [\App\Http\Controllers\Api\TextController::class, 'index']);

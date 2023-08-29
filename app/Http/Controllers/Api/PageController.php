@@ -41,7 +41,7 @@ class PageController extends Controller
          $request->validated();
          $getUploadFile = $request->file('image');
          $imageName = Str::random(32)."background.".$getUploadFile->extension();
-         $imagePath = storage_path('app/public');
+         $imagePath = asset("storage/".$imageName);
          Storage::disk('public')->put($imageName,file_get_contents($request->image));
 
          $image = $this->imageRepo->store([

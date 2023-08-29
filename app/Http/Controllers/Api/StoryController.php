@@ -29,11 +29,14 @@ class StoryController extends Controller
 
     public function index()
     {
-        $this->status = 200;
-        $this->message = "success";
+       
         $data = StoryResource::collection($this->storyRepo->all());
+        if($data){
+            $this->status = 200;
+            $this->message = "success";
+        }
 
-        return $this->responseData($data);
+        return $this->responseData($data??[]);
     }
     public function show($id)
     {
@@ -57,7 +60,8 @@ class StoryController extends Controller
                 $getUpLoadFile = $request->file('image');
                 $imageName = Str::random(32).".".$getUpLoadFile->extension();
                 Storage::disk('public')->put($imageName, file_get_contents($request->image));
-                $imagePath = storage_path("app/public".$imageName);
+                $imagePath = asset("storage/".$imageName);
+
 
                 $image = $this->imageRepo->store([
                     'image' => $imageName,
@@ -91,7 +95,7 @@ class StoryController extends Controller
             }catch (\Exception $e)
             {
                 DB::rollBack();
-                throw new Exception($e->getMessage());
+                throw new \Exception($e->getMessage());
             }
             return $this->responseData($data ?? []);
         }
@@ -142,7 +146,7 @@ class StoryController extends Controller
         {
             db::rollBack();
 
-            throw new Exception($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
             return $this->responseData($data ?? []);
 
